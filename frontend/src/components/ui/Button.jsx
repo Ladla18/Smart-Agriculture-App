@@ -1,11 +1,14 @@
 // src/components/ui/Button.jsx
-import React from "react";
+import React, { createContext, useState } from "react";
 import classNames from "classnames";
+
 
 export const Button = ({
   children,
   variant = "default",
   size = "md",
+  title,
+   onButtonClick,
   className,
   ...props
 }) => {
@@ -21,8 +24,18 @@ export const Button = ({
     lg: "px-5 py-3 text-lg",
   };
 
+   
+  
+
+  const handleToolClick = () => {
+    if (onButtonClick) {
+      onButtonClick(title); // Pass `title` to parent callback
+    }
+  };
+
   return (
     <button
+      onClick={handleToolClick}
       className={classNames(
         "font-medium rounded focus:outline-none flex  focus:ring-2 focus:ring-green-500",
         variants[variant],
