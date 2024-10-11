@@ -12,7 +12,7 @@ export const Header = ({ userType, onLogout }) => (
           {userType === "farmer" ? "Farmer" : "Buyer"} Dashboard
         </span>
         <Button variant="outline" size="sm" onClick={onLogout}>
-          <LogOut className="h-4 w-4 mr-2" />
+          <LogOut className="h-4 w-4 mr-2 mt-0.5" />
           Logout
         </Button>
       </div>

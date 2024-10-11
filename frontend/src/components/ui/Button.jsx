@@ -24,7 +24,7 @@ export const Button = ({
   return (
     <button
       className={classNames(
-        "font-medium rounded focus:outline-none focus:ring-2 focus:ring-green-500",
+        "font-medium rounded focus:outline-none flex  focus:ring-2 focus:ring-green-500",
         variants[variant],
         sizes[size],
         className
