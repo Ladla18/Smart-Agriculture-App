@@ -70,7 +70,7 @@ export const FarmerDashboard = () => {
       {selectedFeature && <BackButton onResetFeature={handleFeatureReset} />}
       {selectedFeature === "" ? (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-green-800">Farmer Tools</h2>
+          <h2 className="text-2xl font-bold text-white">Farmer Tools</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FeatureCard
               onFeatureSelect={handleFeatureSelect}

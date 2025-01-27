@@ -44,7 +44,7 @@ export const TabsTrigger = ({
         "px-4 py-2 -mb-px text-sm font-medium focus:outline-none",
         isActive
           ? "border-b-2 border-green-600 text-green-600"
-          : "text-gray-600 hover:text-green-600"
+          : "text-white hover:text-green-600"
       )}
     >
       {children}
