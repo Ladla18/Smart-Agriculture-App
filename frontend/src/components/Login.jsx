@@ -1,19 +1,24 @@
 // Login and Signup Page Component
 import React, { useState } from "react";
 import { User, Lock, Mail, Phone } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
+import { useToast } from "../components/ui/use-toast";
 import axios from "axios";
 
 export const LoginPage = ({ onLogin, onSignup }) => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState("farmer");
   const [signupType, setSignupType] = useState("farmer");
+  
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+    userType: userType
+  });
+
   const [signupData, setSignupData] = useState({
     fullName: "",
     email: "",
@@ -22,33 +27,74 @@ export const LoginPage = ({ onLogin, onSignup }) => {
     userType: signupType
   });
 
-  const handleSignup = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
-
-    setSignupData({
-      fullName: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-      userType: signupType
-    });
-
-    const response  = await axios.post("http://localhost:3000/api/user/signup", signupData);
-    console.log(response.data);
-
-
-
-
-    console.log(signupData);
+    setIsLoading(true);
+    try {
+      const response = await axios.post("http://localhost:3000/api/user/login", loginData);
+      toast({
+        title: "Success!",
+        description: "Login successful",
+      });
+      onLogin(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Login failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleInputChange = (e) => {
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await axios.post("http://localhost:3000/api/user/signup", {
+        ...signupData,
+        userType: signupType
+      });
+      toast({
+        title: "Success!",
+        description: "Account created successfully",
+      });
+      setSignupData({
+        fullName: "",
+        email: "",
+        phoneNumber: "",
+        password: "",
+        userType: signupType
+      });
+      onSignup(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Signup failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLoginInputChange = (e) => {
     const { name, value } = e.target;
-    setSignupData({
-      ...signupData,
-      [name]: value
-    });
+    setLoginData(prev => ({
+      ...prev,
+      [name]: value,
+      userType
+    }));
+  };
+
+  const handleSignupInputChange = (e) => {
+    const { name, value } = e.target;
+    setSignupData(prev => ({
+      ...prev,
+      [name]: value,
+      userType: signupType
+    }));
   };
 
   return (
@@ -62,24 +108,25 @@ export const LoginPage = ({ onLogin, onSignup }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                onLogin(userType);
-              }}
-              className="space-y-4"
-            >
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="flex items-center space-x-2 p-2 border rounded">
-                <User className="text-gray-500" />
+                <Mail className="text-gray-500" />
                 <Input
-                  placeholder="Username"
+                  name="email"
+                  type="email"
+                  value={loginData.email}
+                  onChange={handleLoginInputChange}
+                  placeholder="Email"
                   className="border-0 focus:ring-0"
                 />
               </div>
               <div className="flex items-center space-x-2 p-2 border rounded">
                 <Lock className="text-gray-500" />
                 <Input
+                  name="password"
                   type="password"
+                  value={loginData.password}
+                  onChange={handleLoginInputChange}
                   placeholder="Password"
                   className="border-0 focus:ring-0"
                 />
@@ -100,8 +147,8 @@ export const LoginPage = ({ onLogin, onSignup }) => {
                   Buyer
                 </Button>
               </div>
-              <Button type="submit" className="w-full">
-                Log In
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Loading..." : "Log In"}
               </Button>
             </form>
           </CardContent>
@@ -115,16 +162,13 @@ export const LoginPage = ({ onLogin, onSignup }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form
-              onSubmit={handleSignup}
-              className="space-y-4"
-            >
+            <form onSubmit={handleSignup} className="space-y-4">
               <div className="flex items-center space-x-2 p-2 border rounded">
                 <User className="text-gray-500" />
                 <Input
                   name="fullName"
                   value={signupData.fullName}
-                  onChange={handleInputChange}
+                  onChange={handleSignupInputChange}
                   placeholder="Full Name"
                   className="border-0 focus:ring-0"
                 />
@@ -135,7 +179,7 @@ export const LoginPage = ({ onLogin, onSignup }) => {
                   name="email"
                   type="email"
                   value={signupData.email}
-                  onChange={handleInputChange}
+                  onChange={handleSignupInputChange}
                   placeholder="Email"
                   className="border-0 focus:ring-0"
                 />
@@ -146,7 +190,7 @@ export const LoginPage = ({ onLogin, onSignup }) => {
                   name="phoneNumber"
                   type="tel"
                   value={signupData.phoneNumber}
-                  onChange={handleInputChange}
+                  onChange={handleSignupInputChange}
                   placeholder="Phone Number"
                   className="border-0 focus:ring-0"
                 />
@@ -157,7 +201,7 @@ export const LoginPage = ({ onLogin, onSignup }) => {
                   name="password"
                   type="password"
                   value={signupData.password}
-                  onChange={handleInputChange}
+                  onChange={handleSignupInputChange}
                   placeholder="Password"
                   className="border-0 focus:ring-0"
                 />
@@ -178,11 +222,9 @@ export const LoginPage = ({ onLogin, onSignup }) => {
                   Buyer
                 </Button>
               </div>
-              
-                <Button type="submit" className="w-full  ">
-                  Sign Up
-                </Button>
-       
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Loading..." : "Sign Up"}
+              </Button>
             </form>
           </CardContent>
         </Card>
