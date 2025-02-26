@@ -1,16 +1,6 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./components/ui/Card"; 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "./components/ui/Tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/Tabs";
 import { Footer } from "./components/Footer";
 import { FarmerDashboard } from "./pages/FarmerDashboard";
 import { BuyerDashboard } from "./pages/BuyerDashboard";
