@@ -59,11 +59,27 @@ export const LoginPage = ({ onLogin, onSignup }) => {
           userType: signupType,
         }
       );
-      toast.success("Account created successfully!");
-      setSignupData({ fullName: "", email: "", phoneNumber: "", password: "" });
-      onSignup(response.data);
+
+      if (response.data) {
+        setSignupData({
+          fullName: "",
+          email: "",
+          phoneNumber: "",
+          password: "",
+        });
+        toast.success("Account created successfully!");
+        if (typeof onSignup === "function") {
+          setTimeout(() => {
+            onSignup(response.data);
+          }, 1000);
+        }
+      }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Signup failed.");
+      if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Signup failed. Please try again.");
+      }
     } finally {
       setSignupLoading(false);
     }
