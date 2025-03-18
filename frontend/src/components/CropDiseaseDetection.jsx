@@ -21,7 +21,7 @@ export const CropDiseaseDetection = () => {
   const speechSynthRef = useRef(null);
 
   useEffect(() => {
-    loadModel();
+    initializeModel();
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
@@ -32,13 +32,24 @@ export const CropDiseaseDetection = () => {
     };
   }, []);
 
-  const loadModel = async () => {
+  const initializeModel = async () => {
+    setIsModelLoading(true);
     try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey || apiKey === "your_api_key_here") {
+        throw new Error(
+          "Please configure your Gemini API key in the .env file"
+        );
+      }
       await diseaseDetectionService.loadModel();
+      console.log("Model initialized successfully");
       setIsModelLoading(false);
     } catch (error) {
-      toast.error("Failed to load disease detection model");
-      setIsModelLoading(false);
+      console.error("Model initialization error:", error);
+      toast.error(
+        error.message || "Failed to initialize disease detection model"
+      );
+      setIsModelLoading(true); // Keep the loading state true to prevent usage
     }
   };
 
@@ -88,6 +99,10 @@ export const CropDiseaseDetection = () => {
 
   const detectDisease = async () => {
     if (!selectedImage) return;
+    if (isModelLoading) {
+      toast.error("Please wait for the model to initialize");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -100,7 +115,13 @@ export const CropDiseaseDetection = () => {
       setTranslatedResult(null);
     } catch (error) {
       console.error("Detection error:", error);
-      toast.error("Failed to analyze image");
+      if (error.message.includes("Model not initialized")) {
+        toast.error("Model not ready. Please try again in a moment.");
+        // Try to reinitialize the model
+        await initializeModel();
+      } else {
+        toast.error("Failed to analyze image");
+      }
     } finally {
       setIsLoading(false);
     }

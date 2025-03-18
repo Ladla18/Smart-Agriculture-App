@@ -6,14 +6,17 @@ let genAI = null;
 export const diseaseDetectionService = {
   loadModel: async () => {
     try {
-      const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-      if (!apiKey) {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      console.log("API Key status:", apiKey ? "Present" : "Missing");
+
+      if (!apiKey || apiKey === "your_api_key_here") {
         throw new Error(
-          "API key is missing. Set REACT_APP_GEMINI_API_KEY in your environment variables."
+          "API key is missing or invalid. Set VITE_GEMINI_API_KEY in your .env file."
         );
       }
 
       genAI = new GoogleGenerativeAI(apiKey);
+      console.log("Gemini AI initialized successfully");
       return true;
     } catch (error) {
       console.error("Error loading Gemini model:", error);
@@ -24,6 +27,7 @@ export const diseaseDetectionService = {
   analyzeImage: async (imageElement) => {
     try {
       if (!genAI) {
+        console.error("genAI is not initialized");
         throw new Error("Model not initialized. Call loadModel() first.");
       }
 
@@ -37,7 +41,7 @@ export const diseaseDetectionService = {
 
       // Get the generative model
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.0-flash", // Updated to use the correct model name
       });
 
       // Prepare the prompt

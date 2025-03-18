@@ -34,7 +34,24 @@ export const userService = {
   },
 
   getCurrentUser: () => {
-    const token = localStorage.getItem("token");
-    return token ? JSON.parse(atob(token.split(".")[1])) : null;
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+
+      const base64Url = token.split(".")[1];
+      if (!base64Url) return null;
+
+      const payload = JSON.parse(atob(base64Url));
+      if (!payload || !payload.userType || !payload.userId) {
+        localStorage.removeItem("token"); // Remove invalid token
+        return null;
+      }
+
+      return payload;
+    } catch (error) {
+      console.error("Error parsing token:", error);
+      localStorage.removeItem("token"); // Remove invalid token
+      return null;
+    }
   },
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/Tabs";
 import { Footer } from "./components/Footer";
@@ -9,6 +9,7 @@ import { Signup } from "./components/Signup";
 import { Header } from "./components/Header";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CropDiseaseDetection } from './components/CropDiseaseDetection';
+import { userService } from "./services/userService";
 
 const DashboardLayout = ({ userType, onLogout }) => {
   return (
@@ -44,12 +45,28 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
 
+  // Initialize auth state from localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const user = userService.getCurrentUser();
+      if (user && user.userType) {
+        setIsLoggedIn(true);
+        setUserType(user.userType);
+      } else {
+        // Invalid or expired token
+        localStorage.removeItem("token");
+      }
+    }
+  }, []);
+
   const handleLogin = (type) => {
     setIsLoggedIn(true);
     setUserType(type);
   };
 
   const handleLogout = () => {
+    userService.logout();
     setIsLoggedIn(false);
     setUserType(null);
   };
